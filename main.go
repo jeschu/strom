@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	config "github.com/jeschu/go-config"
+	cfg "github.com/jeschu/go-config"
 	"log"
 	"os"
 	"strconv"
@@ -15,13 +15,17 @@ func main() {
 		err          error
 	)
 	strom := Strom{}
-	if err = config.LoadConfigYaml("strom.yml", &strom); err != nil {
+	if err = cfg.ReadConfigYaml("strom.yml", &strom); err != nil {
 		log.Fatal(err)
 	}
 	if len(os.Args) < 1 {
 		os.Exit(1)
 	}
-	zaehlerstand, err = strconv.ParseFloat(os.Args[1], 64)
+	if zaehlerstand, err = strconv.ParseFloat(os.Args[1], 64); err != nil {
+		panic(err)
+	}
+	strom.Zaehlerstaende = append(strom.Zaehlerstaende, Zaehlerstand{Time: time.Now(), Zaehler: zaehlerstand})
+	err = cfg.WriteConfigYaml("strom.yml", &strom)
 	verbrauch := zaehlerstand - strom.Start.Zaehler
 	now := time.Now()
 	days := now.Sub(strom.Start.Datum).Hours() / 24.0
@@ -45,9 +49,10 @@ func main() {
 }
 
 type Strom struct {
-	Start    Start   `yaml:"start"`
-	Tarif    Tarif   `yaml:"tarif"`
-	Abschlag float64 `yaml:"abschlag"`
+	Start          Start          `yaml:"start"`
+	Tarif          Tarif          `yaml:"tarif"`
+	Abschlag       float64        `yaml:"abschlag"`
+	Zaehlerstaende []Zaehlerstand `yaml:"zaehlerstaende"`
 }
 
 type Start struct {
@@ -58,4 +63,9 @@ type Start struct {
 type Tarif struct {
 	Grundgebuehr   float64 `yaml:"grundgebuehr"`
 	ArbeitspreisCt float64 `yaml:"arbeitspreisCt"`
+}
+
+type Zaehlerstand struct {
+	Time    time.Time
+	Zaehler float64 `yaml:"zaehler""`
 }
