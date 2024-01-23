@@ -22,3 +22,5 @@ go.work
 
 /.idea/
 /build/
+/version.go
+.DS_Store

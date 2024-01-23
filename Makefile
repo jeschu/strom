@@ -6,10 +6,18 @@ show-config:
 	@cat ~/Library/Application\ Support/strom.yml
 	@echo "--- ~/Library/Application\ Support/strom.yml ---"
 
-build:
-	@echo ">> build <<"
-	@go build -a -o "build/strom" ./...
+clean:
+	@echo ">> clean <<"
+	@rm -rfv version.go build
 
-install: build
+generate:
+	@echo ">> generate <<"
+	@go generate
+
+build: generate
+	@echo ">> build <<"
+	@go build -o "build/strom" ./...
+
+install: clean build
 	@echo ">> install <<"
 	@go install ./...
