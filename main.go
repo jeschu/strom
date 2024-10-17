@@ -10,22 +10,18 @@ import (
 )
 
 func main() {
-	var (
-		zaehlerstand float64
-		err          error
-	)
+	var err error
 	strom := Strom{}
 	if err = cfg.ReadConfigYaml("strom.yml", &strom); err != nil {
 		log.Fatal(err)
 	}
-	if len(os.Args) < 1 {
-		os.Exit(1)
+	if len(os.Args) > 1 {
+		if input, err := strconv.ParseFloat(os.Args[1], 64); err == nil {
+			strom.Zaehlerstaende = append(strom.Zaehlerstaende, Zaehlerstand{Time: time.Now(), Zaehler: input})
+			err = cfg.WriteConfigYaml("strom.yml", &strom)
+		}
 	}
-	if zaehlerstand, err = strconv.ParseFloat(os.Args[1], 64); err != nil {
-		panic(err)
-	}
-	strom.Zaehlerstaende = append(strom.Zaehlerstaende, Zaehlerstand{Time: time.Now(), Zaehler: zaehlerstand})
-	err = cfg.WriteConfigYaml("strom.yml", &strom)
+	zaehlerstand := (strom.Zaehlerstaende[len(strom.Zaehlerstaende)-1]).Zaehler
 	verbrauch := zaehlerstand - strom.Start.Zaehler
 	now := time.Now()
 	days := now.Sub(strom.Start.Datum).Hours() / 24.0
@@ -67,5 +63,5 @@ type Tarif struct {
 
 type Zaehlerstand struct {
 	Time    time.Time
-	Zaehler float64 `yaml:"zaehler""`
+	Zaehler float64 `yaml:"zaehler"`
 }
