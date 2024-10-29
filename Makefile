@@ -21,3 +21,7 @@ build: generate
 install: clean build
 	@echo ">> install <<"
 	@go install ./...
+
+edit:
+	@echo ">> edit <<"
+	code ~/Library/Application\ Support/strom.yml
