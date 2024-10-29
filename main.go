@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	now := time.Now().AddDate(0, 2, 0)
+	now := time.Now()
 	if len(os.Args) > 1 {
 		var input float64
 		if input, err = strconv.ParseFloat(os.Args[1], 64); err == nil {
